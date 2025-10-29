@@ -1,6 +1,6 @@
-// ignore_for_file: unused_local_variable
-
+import 'screens/article.dart';
 import 'package:flutter/material.dart';
+import 'servises/API_serv.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 void main() => runApp(const AppBarApp());
@@ -11,22 +11,44 @@ class AppBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: AppBarExample(),
+      home: Home(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class AppBarExample extends StatefulWidget {
-  const AppBarExample({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<AppBarExample> createState() => _AppBarExampleState();
+  State<Home> createState() => _HomeState();
 }
 
-class _AppBarExampleState extends State<AppBarExample> {  
+class _HomeState extends State<Home> {  
   final TextEditingController searchController = TextEditingController();
   bool isDarkMode = false; 
+  final ApiService apiService = ApiService();
+  List<dynamic> articles = [];
+  bool isLoading = true;
+
+ @override
+void initState() {
+  super.initState();
+  loadNews();
+}
+
+Future<void> loadNews() async {
+  try {
+    final data = await apiService.fetchTeslaNews();
+    setState(() {
+      articles = data;
+      isLoading = false;
+    });
+  } catch (e) {
+    print("Ошибка: $e");
+    setState(() => isLoading = false);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -147,10 +169,57 @@ class _AppBarExampleState extends State<AppBarExample> {
                 Text('See All')
 
               ],),
-            )
+            ),
+            
 
 
+            isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: articles.length,
+              shrinkWrap: true, // ✅ важно
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final article = articles[index];
+                return Card(
+                  margin: const EdgeInsets.all(8),
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: ListTile(
+                    leading: article['urlToImage'] != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              article['urlToImage'],
+                              width: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Icon(Icons.image_not_supported),
+                    title: Text(
+                      article['title'] ?? 'Без заголовка',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(
+                      article['description'] ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArticlePage(article: article),
+                        ),
+                      );
+                    },
 
+                  ),
+                );
+              },
+            ),
             
             
           ]
