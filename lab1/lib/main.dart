@@ -21,21 +21,44 @@ class AppBarExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Row(
           children: [
             SvgPicture.asset(
-                      'assets/logo/logo.svg',
-                      height: 30,
-                    ),
-                    const SizedBox(height: 200),
-            Icon(Icons.notifications_none_outlined),
+              'assets/logo/logo.svg',
+              height: 30,
+            ),
+            const SizedBox(height: 200),
           ],
-        )
+        ),
+        actions: [            
+          Container(
+            height: 40,
+            width: 40,
+            margin: EdgeInsets.only(right: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all( // Рамка (граница)
+                color: Colors.white, 
+              ),  
+              boxShadow: [ 
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 4, 
+                offset: Offset(0, 2), 
+              ),
+            ],
+            ),
+            child: Icon(Icons.notifications_none_outlined),
+          )
+        ],
       ),
       body:SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Expanded(child: Column(
+        child:Column(
           children: [
             Container(
               height:40,
@@ -46,8 +69,8 @@ class AppBarExample extends StatelessWidget {
               margin: EdgeInsets.all(10),
             )
           ],
-        )),
-      )
+        )
+      ),
     );
   }
 }
